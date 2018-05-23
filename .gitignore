@@ -4,6 +4,8 @@
 [Bb]uild/
 [Bb]uilds/
 Assets/AssetStoreTools*
+Assets/Plugins/EModules*
+Assets/Movinarc*
 
 # Visual Studio cache directory
 .vs/
