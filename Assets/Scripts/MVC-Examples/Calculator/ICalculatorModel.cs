@@ -1,7 +1,6 @@
-using MVC;
 using System;
 
-namespace Calculator
+namespace Mvc.Examples.Calculator
 {
     /// <summary>
     /// Arguments of OnOperandChanged event

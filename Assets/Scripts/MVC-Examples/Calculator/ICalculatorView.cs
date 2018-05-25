@@ -1,7 +1,6 @@
 using System;
-using MVC;
 
-namespace Calculator
+namespace Mvc.Examples.Calculator
 {
     /// <summary>
     /// Arguments of OnKeyPressed event triggered by ICalculatorView

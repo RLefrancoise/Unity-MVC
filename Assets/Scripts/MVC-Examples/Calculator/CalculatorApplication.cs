@@ -1,7 +1,7 @@
 using UnityEngine;
-using MVC.Unity;
+using Mvc.Unity;
 
-namespace Calculator
+namespace Mvc.Examples.Calculator
 {
     /// <inheritdoc cref="UnityMvcApplication{ICalculatorControllerFactory}"/>
     /// <summary>

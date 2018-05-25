@@ -1,6 +1,4 @@
-﻿using MVC;
-
-namespace Calculator
+﻿namespace Mvc.Examples.Calculator
 {
     /// <inheritdoc cref="IControllerFactoryParams"/>
     /// <summary>

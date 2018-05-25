@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-namespace Calculator
+namespace Mvc.Examples.Calculator
 {
     /// <inheritdoc cref="ICalculatorView"/>
     /// <summary>

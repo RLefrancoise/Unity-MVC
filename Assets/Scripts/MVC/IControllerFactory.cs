@@ -1,4 +1,4 @@
-﻿namespace MVC
+﻿namespace Mvc
 {
     /// <summary>
     /// Interface for IControllerFactory params

@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace MVC.Unity
+namespace Mvc.Unity
 {
     /// <inheritdoc cref="IApplication"/>
     /// <summary>

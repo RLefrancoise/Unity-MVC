@@ -1,4 +1,4 @@
-﻿namespace MVC
+﻿namespace Mvc
 {
     /// <summary>
     /// Base interface for MVC model

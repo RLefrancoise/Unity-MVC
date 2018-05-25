@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Calculator;
-using MVC;
 
-namespace Tests.Calculator
+namespace Mvc.Examples.Calculator.Tests
 {
     public class CalculatorTestApplication : ICalculatorApplication
     {

@@ -1,4 +1,4 @@
-namespace Calculator
+namespace Mvc.Examples.Calculator
 {
     /// <summary>
     /// List of operations supported by the calculator

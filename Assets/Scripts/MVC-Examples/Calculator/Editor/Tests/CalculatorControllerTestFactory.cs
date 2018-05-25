@@ -1,12 +1,6 @@
-﻿using MVC;
-
-namespace Calculator
+﻿namespace Mvc.Examples.Calculator.Tests
 {
-    /// <inheritdoc />
-    /// <summary>
-    /// Factory for calculator controllers
-    /// </summary>
-    public class CalculatorControllerFactory : ICalculatorControllerFactory
+    public class CalculatorControllerTestFactory : ICalculatorControllerFactory
     {
         public TController CreateController<TController>(CalculatorControllerFactoryParams parameters) where TController : IController
         {
@@ -15,7 +9,7 @@ namespace Calculator
 
         public IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
         {
-            return (IController) CreateItem(parameters);
+            return (TController)CreateItem(parameters);
         }
 
         public object CreateItem(object parameters)

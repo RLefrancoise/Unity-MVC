@@ -1,8 +1,7 @@
 ﻿using System;
-using Calculator;
 using NUnit.Framework;
 
-namespace Tests.Calculator
+namespace Mvc.Examples.Calculator.Tests
 {
     public class CalculatorTest
     {

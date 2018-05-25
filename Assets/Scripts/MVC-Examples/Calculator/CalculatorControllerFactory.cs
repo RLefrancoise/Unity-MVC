@@ -1,9 +1,10 @@
-﻿using Calculator;
-using MVC;
-
-namespace Tests.Calculator
+﻿namespace Mvc.Examples.Calculator
 {
-    public class CalculatorControllerTestFactory : ICalculatorControllerFactory
+    /// <inheritdoc />
+    /// <summary>
+    /// Factory for calculator controllers
+    /// </summary>
+    public class CalculatorControllerFactory : ICalculatorControllerFactory
     {
         public TController CreateController<TController>(CalculatorControllerFactoryParams parameters) where TController : IController
         {
@@ -12,7 +13,7 @@ namespace Tests.Calculator
 
         public IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
         {
-            return (TController)CreateItem(parameters);
+            return (IController) CreateItem(parameters);
         }
 
         public object CreateItem(object parameters)

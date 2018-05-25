@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MVC
+namespace Mvc
 {
     /// <summary>
     /// Base interface for MVC application
