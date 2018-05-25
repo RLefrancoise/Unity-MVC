@@ -2,7 +2,8 @@
 
 namespace Mvc.Examples.Calculator
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="AbstractFactory"/>
+    /// <inheritdoc cref="ICalculatorControllerFactory"/>
     /// <summary>
     /// Factory for calculator controllers
     /// </summary>
@@ -15,7 +16,7 @@ namespace Mvc.Examples.Calculator
 
         public IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
         {
-            return CreateItem<TController>(new object[] { new CalculatorModel(), (parameters as CalculatorControllerFactoryParams).View });
+            return CreateController<TController>(parameters as CalculatorControllerFactoryParams);
         }
     }
 }
