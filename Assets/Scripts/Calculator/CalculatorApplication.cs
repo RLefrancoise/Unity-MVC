@@ -7,7 +7,7 @@ namespace Calculator
     /// <summary>
     /// The calculator application
     /// </summary>
-    public class CalculatorApplication : UnityMvcApplication<ICalculatorControllerFactory>
+    public class CalculatorApplication : UnityMvcApplication<ICalculatorControllerFactory>, ICalculatorApplication
     {
         /// <summary>
         /// The GameObject of the view
