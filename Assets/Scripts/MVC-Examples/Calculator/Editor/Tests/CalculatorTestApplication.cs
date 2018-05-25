@@ -10,7 +10,7 @@ namespace Mvc.Examples.Calculator.Tests
         public CalculatorTestApplication()
         {
             Controllers = new List<IController>();
-            _controllerFactory = new CalculatorControllerTestFactory();
+            _controllerFactory = new CalculatorControllerFactory();
 
             CreateController<CalculatorController>(new CalculatorControllerFactoryParams {View = new CalculatorTestView()});
         }

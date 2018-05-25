@@ -8,13 +8,18 @@
         
     }
 
+    /// <inheritdoc cref="IFactory"/>
+    /// <summary>
+    /// Interface for controller factory
+    /// </summary>
     public interface IControllerFactory : IFactory
     {
         IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController;
     }
 
+    /// <inheritdoc cref="IControllerFactory"/>
     /// <summary>
-    /// Interface for controller factory
+    /// Interface for controller factory with template parameters
     /// </summary>
     public interface IControllerFactory<in TControllerFactoryParams> : IControllerFactory where TControllerFactoryParams : IControllerFactoryParams
     {

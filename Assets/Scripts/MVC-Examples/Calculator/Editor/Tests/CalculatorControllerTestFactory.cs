@@ -1,8 +1,8 @@
 ﻿namespace Mvc.Examples.Calculator.Tests
 {
-    public class CalculatorControllerTestFactory : ICalculatorControllerFactory
+    public class CalculatorControllerTestFactory //: ICalculatorControllerFactory
     {
-        public TController CreateController<TController>(CalculatorControllerFactoryParams parameters) where TController : IController
+        /*public TController CreateController<TController>(CalculatorControllerFactoryParams parameters) where TController : IController
         {
             return (TController) CreateItem(parameters);
         }
@@ -16,6 +16,6 @@
         {
             IController c = new CalculatorController(new CalculatorModel(), ((CalculatorControllerFactoryParams) parameters).View);
             return c;
-        }
+        }*/
     }
 }

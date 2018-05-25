@@ -1,9 +1,10 @@
 namespace Mvc
 {
+    /// <inheritdoc cref="IFactoryItem"/>
     /// <summary>
     /// Base interface for MVC controller
     /// </summary>
-    public interface IController
+    public interface IController : IFactoryItem
     {
         
     }
