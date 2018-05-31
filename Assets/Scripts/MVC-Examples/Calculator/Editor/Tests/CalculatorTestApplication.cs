@@ -5,7 +5,7 @@ namespace Mvc.Examples.Calculator.Tests
 {
     public class CalculatorTestApplication : ICalculatorApplication
     {
-        private readonly ICalculatorControllerFactory _controllerFactory;
+        private ICalculatorControllerFactory _controllerFactory;
 
         public CalculatorTestApplication()
         {
@@ -17,9 +17,14 @@ namespace Mvc.Examples.Calculator.Tests
 
         public List<IController> Controllers { get; private set; }
 
+        public IControllerFactory ControllerFactory
+        {
+            get { return _controllerFactory ?? (_controllerFactory = new CalculatorControllerFactory()); }
+        }
+
         public TController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
         {
-            Controllers.Add(_controllerFactory.CreateController<TController>(parameters));
+            Controllers.Add(ControllerFactory.CreateController<TController>(parameters));
             return (TController) Controllers.Last();
         }
 

@@ -13,7 +13,7 @@ namespace Mvc.Examples.Calculator.Tests
         public void Init()
         {
             application = new CalculatorTestApplication();
-            controller = application.Controllers[0] as ICalculatorController;
+            controller = application.ControllerFactory.Controllers[0] as ICalculatorController;
             view = controller.View as CalculatorTestView;
         }
 

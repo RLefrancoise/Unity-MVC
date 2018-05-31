@@ -1,22 +1,17 @@
-﻿using Mvc.Unity;
+﻿using MVC.Unity;
 
 namespace Mvc.Examples.Calculator
 {
-    /// <inheritdoc cref="AbstractFactory"/>
+    /// <inheritdoc cref="AbstractControllerFactory{CalculatorControllerFactoryParams}"/>
     /// <inheritdoc cref="ICalculatorControllerFactory"/>
     /// <summary>
     /// Factory for calculator controllers
     /// </summary>
-    public class CalculatorControllerFactory : AbstractFactory, ICalculatorControllerFactory
+    public class CalculatorControllerFactory : AbstractControllerFactory<CalculatorControllerFactoryParams>, ICalculatorControllerFactory
     {
-        public TController CreateController<TController>(CalculatorControllerFactoryParams parameters) where TController : IController
+        protected override TController CreateController<TController>(CalculatorControllerFactoryParams parameters)
         {
             return CreateItem<TController>(new object[] {new CalculatorModel(), parameters.View});
-        }
-
-        public IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
-        {
-            return CreateController<TController>(parameters as CalculatorControllerFactoryParams);
         }
     }
 }

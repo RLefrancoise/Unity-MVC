@@ -7,24 +7,26 @@ namespace Mvc
     /// </summary>
     public interface IApplication
     {
+        /*
         /// <summary>
         /// List of controllers created for the application
         /// </summary>
-        List<IController> Controllers { get; }
+        List<IController> Controllers { get; }*/
 
-        /*
+        
         /// <summary>
         /// Factory for controllers
         /// </summary>
-        TControllerFactory ControllerFactory { get; }*/
+        IControllerFactory ControllerFactory { get; }
 
+        /*
         /// <summary>
         /// Create a new controller
         /// </summary>
         /// <typeparam name="TController">The type of the controller to create</typeparam>
         /// <param name="parameters">Parameters to create the controller</param>
         /// <returns>The newly created controller</returns>
-        TController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController;
+        TController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController;*/
 
         /// <summary>
         /// Destroy a created controller

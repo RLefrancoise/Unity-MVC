@@ -16,7 +16,7 @@
     /// <summary>
     /// Interface to implement a factory for a calculator controllers
     /// </summary>
-    public interface ICalculatorControllerFactory : IControllerFactory<CalculatorControllerFactoryParams>
+    public interface ICalculatorControllerFactory : IControllerFactory//<CalculatorControllerFactoryParams>
     {
     }
 }

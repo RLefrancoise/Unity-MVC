@@ -3,18 +3,20 @@ using Mvc.Unity;
 
 namespace Mvc.Examples.Calculator
 {
-    /// <inheritdoc cref="UnityMvcApplication{ICalculatorControllerFactory}"/>
+    /// <inheritdoc cref="UnityMvcApplication"/>
     /// <summary>
     /// The calculator application
     /// </summary>
-    public class CalculatorApplication : UnityMvcApplication<ICalculatorControllerFactory>, ICalculatorApplication
+    public class CalculatorApplication : UnityMvcApplication, ICalculatorApplication
     {
         /// <summary>
         /// The GameObject of the view
         /// </summary>
         [SerializeField]
         private GameObject calculatorViewEntity;
-        
+
+        private IControllerFactory _controllerFactory;
+
         /// <summary>
         /// The view of the calculator entity
         /// </summary>
@@ -23,15 +25,15 @@ namespace Mvc.Examples.Calculator
             get { return calculatorViewEntity.GetComponent<ICalculatorView>(); }
         }
 
+        public override IControllerFactory ControllerFactory
+        {
+            get { return _controllerFactory ?? (_controllerFactory = new CalculatorControllerFactory()); }
+        }
+
         protected override void Awake()
         {
             base.Awake();
             CreateController<CalculatorController>(new CalculatorControllerFactoryParams {View = EntityView});
-        }
-
-        protected override ICalculatorControllerFactory InitializeControllerFactory()
-        {
-            return new CalculatorControllerFactory();
         }
     }
 }
