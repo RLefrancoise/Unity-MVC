@@ -1,7 +1,6 @@
 ﻿using System;
-using Calculator;
 
-namespace Tests.Calculator
+namespace Mvc.Examples.Calculator.Tests
 {
     public class CalculatorTestView : ICalculatorView
     {

@@ -1,6 +1,4 @@
-﻿using MVC;
-
-namespace Calculator
+﻿namespace Mvc.Examples.Calculator
 {
     /// <inheritdoc cref="IControllerFactoryParams"/>
     /// <summary>
@@ -18,7 +16,7 @@ namespace Calculator
     /// <summary>
     /// Interface to implement a factory for a calculator controllers
     /// </summary>
-    public interface ICalculatorControllerFactory : IControllerFactory<CalculatorControllerFactoryParams>
+    public interface ICalculatorControllerFactory : IControllerFactory//<CalculatorControllerFactoryParams>
     {
     }
 }

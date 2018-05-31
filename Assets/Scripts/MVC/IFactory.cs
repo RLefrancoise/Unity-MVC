@@ -1,5 +1,13 @@
-﻿namespace MVC
+﻿namespace Mvc
 {
+    /// <summary>
+    /// Base interface for any object that can be created by a factory
+    /// </summary>
+    public interface IFactoryItem
+    {
+        
+    }
+
     /// <summary>
     /// Base interface for any factory
     /// </summary>
@@ -10,6 +18,6 @@
         /// </summary>
         /// <param name="parameters">Parameters to create the item</param>
         /// <returns>The created item</returns>
-        object CreateItem(object parameters);
+        TFactoryItem CreateItem<TFactoryItem>(object[] parameters) where TFactoryItem : IFactoryItem;
     }
 }

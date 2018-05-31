@@ -1,27 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Calculator;
-using MVC;
 
-namespace Tests.Calculator
+namespace Mvc.Examples.Calculator.Tests
 {
     public class CalculatorTestApplication : ICalculatorApplication
     {
-        private readonly ICalculatorControllerFactory _controllerFactory;
+        private ICalculatorControllerFactory _controllerFactory;
 
         public CalculatorTestApplication()
         {
             Controllers = new List<IController>();
-            _controllerFactory = new CalculatorControllerTestFactory();
+            _controllerFactory = new CalculatorControllerFactory();
 
             CreateController<CalculatorController>(new CalculatorControllerFactoryParams {View = new CalculatorTestView()});
         }
 
         public List<IController> Controllers { get; private set; }
 
+        public IControllerFactory ControllerFactory
+        {
+            get { return _controllerFactory ?? (_controllerFactory = new CalculatorControllerFactory()); }
+        }
+
         public TController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
         {
-            Controllers.Add(_controllerFactory.CreateController<TController>(parameters));
+            Controllers.Add(ControllerFactory.CreateController<TController>(parameters));
             return (TController) Controllers.Last();
         }
 

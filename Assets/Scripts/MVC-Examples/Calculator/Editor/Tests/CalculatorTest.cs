@@ -1,8 +1,7 @@
 ﻿using System;
-using Calculator;
 using NUnit.Framework;
 
-namespace Tests.Calculator
+namespace Mvc.Examples.Calculator.Tests
 {
     public class CalculatorTest
     {
@@ -14,7 +13,7 @@ namespace Tests.Calculator
         public void Init()
         {
             application = new CalculatorTestApplication();
-            controller = application.Controllers[0] as ICalculatorController;
+            controller = application.ControllerFactory.Controllers[0] as ICalculatorController;
             view = controller.View as CalculatorTestView;
         }
 

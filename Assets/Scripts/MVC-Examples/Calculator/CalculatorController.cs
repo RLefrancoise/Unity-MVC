@@ -1,8 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
-using UnityEngine;
 
-namespace Calculator
+namespace Mvc.Examples.Calculator
 {
     /// <inheritdoc />
     /// <summary>
@@ -58,8 +57,6 @@ namespace Calculator
         /// <param name="args">arguments of the event. It contains the typed key.</param>
         private void HandleKeyPressed(object sender, CalculatorKeyPressedEventArgs args)
         {
-            //Debug.LogFormat("Key pressed: {0}", args.Key);
-
             //is clear or result has already been computed
             if(args.Key == "CE" || resultComputed)
             {
@@ -114,9 +111,7 @@ namespace Calculator
         /// <param name="sender">the sender of the event</param>
         /// <param name="args">Contains the changed operand value</param>
         private void HandleOperandChanged(object sender, CalculatorOperandChangedEventArgs args)
-        {
-            //Debug.LogFormat("Operand changed: {0} - {1}", args.Operand, args.Value);
-            
+        {            
             if(args.Operand == "first") View.FirstOperand = args.Value;
             else View.SecondOperand = args.Value;
         }
@@ -128,8 +123,6 @@ namespace Calculator
         /// <param name="args">Contains the new value of the model operation</param>
         private void HandleOperationChanged(object sender, CalculatorOperationChangedEventArgs args)
         {
-            //Debug.LogFormat("Operation changed: {0}", args.Operation);
-
             View.Operation = args.Operation;
         }
 
@@ -140,7 +133,6 @@ namespace Calculator
         /// <param name="args">Contains the value of the result</param>
         private void HandleResultComputed(object sender, CalculatorResultComputedEventArgs args)
         {
-            //Debug.LogFormat("Result: {0}", args.Result);
             View.Result = args.Result;
             resultComputed = true;
         }
@@ -152,8 +144,6 @@ namespace Calculator
         /// <param name="args">Empty arguments</param>
         private void HandleModelCleared(object sender, EventArgs args)
         {
-            //Debug.Log("Model cleared");
-
             View.FirstOperand = Model.FirstOperand;
             View.SecondOperand = Model.SecondOperand;
             View.Operation = Model.Operation;

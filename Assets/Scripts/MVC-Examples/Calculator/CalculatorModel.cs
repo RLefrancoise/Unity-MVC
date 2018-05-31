@@ -1,6 +1,6 @@
 using System;
 
-namespace Calculator
+namespace Mvc.Examples.Calculator
 {
     /// <inheritdoc />
     /// <summary>

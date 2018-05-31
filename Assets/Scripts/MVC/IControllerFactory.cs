@@ -1,4 +1,6 @@
-﻿namespace MVC
+﻿using System.Collections.Generic;
+
+namespace Mvc
 {
     /// <summary>
     /// Interface for IControllerFactory params
@@ -8,13 +10,29 @@
         
     }
 
-    public interface IControllerFactory : IFactory
-    {
-        IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController;
-    }
-
+    /// <inheritdoc cref="IFactory"/>
     /// <summary>
     /// Interface for controller factory
+    /// </summary>
+    public interface IControllerFactory : IFactory
+    {
+        /// <summary>
+        /// Controllers created by the factory
+        /// </summary>
+        List<IController> Controllers { get; }
+
+        /// <summary>
+        /// Create a controller from the specified parameters
+        /// </summary>
+        /// <typeparam name="TController"></typeparam>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
+        IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController;
+    }
+    /*
+    /// <inheritdoc cref="IControllerFactory"/>
+    /// <summary>
+    /// Interface for controller factory with template parameters
     /// </summary>
     public interface IControllerFactory<in TControllerFactoryParams> : IControllerFactory where TControllerFactoryParams : IControllerFactoryParams
     {
@@ -26,5 +44,5 @@
         /// <returns></returns>
         TController CreateController<TController>(TControllerFactoryParams parameters)
             where TController : IController;
-    }
+    }*/
 }
