@@ -30,10 +30,9 @@ namespace Mvc.Examples.Calculator
             get { return _controllerFactory ?? (_controllerFactory = new CalculatorControllerFactory()); }
         }
 
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
-            CreateController<CalculatorController>(new CalculatorControllerFactoryParams {View = EntityView});
+            ControllerFactory.CreateController<CalculatorController>(new CalculatorControllerFactoryParams {View = EntityView});
         }
     }
 }

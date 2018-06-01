@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Mvc.Unity
 {
@@ -8,27 +6,13 @@ namespace Mvc.Unity
     /// <summary>
     /// Base class for any Unity Mvc application
     /// </summary>
-    /// <typeparam name="TControllerFactory"></typeparam>
-    public abstract class UnityMvcApplication/*<TControllerFactory>*/ : MonoBehaviour, IApplication //where TControllerFactory : IControllerFactory
+    public abstract class UnityMvcApplication : MonoBehaviour, IApplication
     {
-        public List<IController> Controllers { get; private set; }
-
         public abstract IControllerFactory ControllerFactory { get; }
-
-        protected virtual void Awake()
-        {
-            Controllers = new List<IController>();
-        }
-
-        public TController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
-        {
-            Controllers.Add(ControllerFactory.CreateController<TController>(parameters));
-            return (TController) Controllers.Last();
-        }
 
         public bool DestroyController(IController controller)
         {
-            return Controllers.Remove(controller);   
+            return ControllerFactory.Controllers.Remove(controller);   
         }
     }
 }
