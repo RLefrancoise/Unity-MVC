@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Mvc
 {
@@ -24,8 +25,16 @@ namespace Mvc
         /// <summary>
         /// Create a controller from the specified parameters
         /// </summary>
-        /// <typeparam name="TController"></typeparam>
-        /// <param name="parameters"></param>
+        /// <param name="controllerType">Type of the controller</param>
+        /// <param name="paramters">Parameters to create the controller</param>
+        /// <returns></returns>
+        IController CreateController(Type controllerType, IControllerFactoryParams paramters);
+
+        /// <summary>
+        /// Create a controller from the specified parameters
+        /// </summary>
+        /// <typeparam name="TController">Type of the controller</typeparam>
+        /// <param name="parameters">Parameters to create the controller</param>
         /// <returns></returns>
         IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController;
     }
