@@ -9,20 +9,24 @@ namespace Mvc.Unity
     /// </summary>
     public abstract class AbstractFactory : IFactory
     {
-        public List<IController> Controllers { get; private set; }
+        //public List<IController> Controllers { get; private set; }
 
+        /// <inheritdoc />
         /// <summary>
         /// Contruct a new factory
         /// </summary>
-        protected AbstractFactory()
+
+        public IFactoryItem CreateItem(Type type, object[] parameters)
         {
-            Controllers = new List<IController>();
+            IFactoryItem item = (IFactoryItem) Activator.CreateInstance(type, parameters);
+            return item;
+            //Controllers.Add(item);
         }
 
         public TFactoryItem CreateItem<TFactoryItem>(object[] parameters) where TFactoryItem : IFactoryItem
         {
             TFactoryItem item = (TFactoryItem) Activator.CreateInstance(typeof(TFactoryItem), parameters);
-            Controllers.Add((IController) item);
+            //Controllers.Add((IController) item);
             return item;
         }
     }
