@@ -1,3 +1,6 @@
+// This file is part of the Unity-MVC Project
+// https://github.com/RLefrancoise/Unity-MVC
+// 
 // BSD 3-Clause License
 // 
 // Copyright (c) 2018, Renaud Lefrancoise
