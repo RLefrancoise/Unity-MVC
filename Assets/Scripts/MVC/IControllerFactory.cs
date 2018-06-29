@@ -68,6 +68,6 @@ namespace Mvc
         /// <typeparam name="TController">Type of the controller</typeparam>
         /// <param name="parameters">Parameters to create the controller</param>
         /// <returns></returns>
-        IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController;
+        TController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController;
     }
 }

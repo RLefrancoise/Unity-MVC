@@ -32,10 +32,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections.Generic;
-using Mvc;
-using Mvc.Unity;
 
-namespace MVC.Unity
+namespace Mvc.Unity
 {
     /// <inheritdoc cref="AbstractFactory"/>
     /// <inheritdoc cref="IControllerFactory"/>
@@ -75,11 +73,9 @@ namespace MVC.Unity
             return controller;
         }
 
-        public IController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
+        public TController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
         {
-            TController controller = CreateController<TController>((TControllerFactoryParams) parameters);
-            Controllers.Add(controller);
-            return controller;
+            return (TController) CreateController(typeof(TController), (TControllerFactoryParams) parameters);
         }
     }
 }

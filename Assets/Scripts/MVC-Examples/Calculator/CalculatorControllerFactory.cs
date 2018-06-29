@@ -31,11 +31,11 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
-using MVC.Unity;
+using Mvc.Unity;
 
 namespace Mvc.Examples.Calculator
 {
-    /// <inheritdoc cref="AbstractControllerFactory{CalculatorControllerFactoryParams}"/>
+    /// <inheritdoc cref="AbstractControllerFactory{TControllerFactoryParams}"/>
     /// <inheritdoc cref="ICalculatorControllerFactory"/>
     /// <summary>
     /// Factory for calculator controllers
