@@ -1,4 +1,4 @@
-﻿// This file is part of the Unity-MVC Project
+﻿// This file is part of the Unity-MVC project
 // https://github.com/RLefrancoise/Unity-MVC
 // 
 // BSD 3-Clause License
@@ -30,26 +30,33 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using System;
-using Mvc.Unity;
+using Mvc;
 
-namespace Mvc.Examples.Calculator
+namespace Mvc.Screens
 {
-    /// <inheritdoc cref="AbstractControllerFactory{TControllerFactoryParams}"/>
-    /// <inheritdoc cref="ICalculatorControllerFactory"/>
     /// <summary>
-    /// Factory for calculator controllers
+    /// Base interface for any screen of the application
     /// </summary>
-    public class CalculatorControllerFactory : AbstractControllerFactory<CalculatorControllerFactoryParams>, ICalculatorControllerFactory
+    public interface IScreen
     {
-        protected override IController CreateController(Type controllerType, CalculatorControllerFactoryParams parameters)
-        {
-            return (IController) CreateItem(controllerType, new object[] {new CalculatorModel(), parameters.View});
-        }
+        /// <summary>
+        /// Called when screen is created
+        /// </summary>
+        void OnCreate();
 
-        protected override TController CreateController<TController>(CalculatorControllerFactoryParams parameters)
-        {
-            return (TController) CreateController(typeof(TController), parameters);
-        }
+        /// <summary>
+        /// Called when screen is destroyed
+        /// </summary>
+        void OnDestroyed();
+
+        /// <summary>
+        /// Called when screen is shown
+        /// </summary>
+        void OnShow();
+
+        /// <summary>
+        /// Called when screen is hidden
+        /// </summary>
+        void OnHide();
     }
 }

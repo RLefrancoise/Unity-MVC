@@ -1,4 +1,4 @@
-﻿// This file is part of the Unity-MVC Project
+﻿// This file is part of the Unity-MVC project
 // https://github.com/RLefrancoise/Unity-MVC
 // 
 // BSD 3-Clause License
@@ -30,26 +30,39 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using System;
-using Mvc.Unity;
+using UnityEngine;
 
-namespace Mvc.Examples.Calculator
+namespace Mvc.Screens.Unity
 {
-    /// <inheritdoc cref="AbstractControllerFactory{TControllerFactoryParams}"/>
-    /// <inheritdoc cref="ICalculatorControllerFactory"/>
+    /// <inheritdoc cref="IMvcScreen{TView}" />
     /// <summary>
-    /// Factory for calculator controllers
     /// </summary>
-    public class CalculatorControllerFactory : AbstractControllerFactory<CalculatorControllerFactoryParams>, ICalculatorControllerFactory
+    /// <typeparam name="TController"></typeparam>
+    public abstract class UnityMvcScreen<TController> : MonoBehaviour, IMvcScreen<TController> where TController : IController
     {
-        protected override IController CreateController(Type controllerType, CalculatorControllerFactoryParams parameters)
+        protected virtual void Awake()
         {
-            return (IController) CreateItem(controllerType, new object[] {new CalculatorModel(), parameters.View});
+            Controller = CreateController();
         }
 
-        protected override TController CreateController<TController>(CalculatorControllerFactoryParams parameters)
+        public virtual void OnCreate()
         {
-            return (TController) CreateController(typeof(TController), parameters);
         }
+
+        public virtual void OnDestroyed() { }
+
+        public virtual void OnShow()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public virtual void OnHide()
+        {
+            gameObject.SetActive(false);
+        }
+
+        protected abstract TController CreateController();
+
+        public virtual TController Controller { get; private set; }
     }
 }

@@ -75,7 +75,7 @@ namespace Mvc.Unity
 
         public TController CreateController<TController>(IControllerFactoryParams parameters) where TController : IController
         {
-            return (TController) CreateController(typeof(TController), (TControllerFactoryParams) parameters);
+            return (TController) CreateController(typeof(TController), parameters);
         }
     }
 }

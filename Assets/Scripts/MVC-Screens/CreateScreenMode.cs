@@ -1,4 +1,4 @@
-﻿// This file is part of the Unity-MVC Project
+﻿// This file is part of the Unity-MVC project
 // https://github.com/RLefrancoise/Unity-MVC
 // 
 // BSD 3-Clause License
@@ -30,26 +30,20 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using System;
-using Mvc.Unity;
-
-namespace Mvc.Examples.Calculator
+namespace Mvc.Screens
 {
-    /// <inheritdoc cref="AbstractControllerFactory{TControllerFactoryParams}"/>
-    /// <inheritdoc cref="ICalculatorControllerFactory"/>
     /// <summary>
-    /// Factory for calculator controllers
+    /// Mode for screen creation
     /// </summary>
-    public class CalculatorControllerFactory : AbstractControllerFactory<CalculatorControllerFactoryParams>, ICalculatorControllerFactory
+    public enum CreateScreenMode
     {
-        protected override IController CreateController(Type controllerType, CalculatorControllerFactoryParams parameters)
-        {
-            return (IController) CreateItem(controllerType, new object[] {new CalculatorModel(), parameters.View});
-        }
-
-        protected override TController CreateController<TController>(CalculatorControllerFactoryParams parameters)
-        {
-            return (TController) CreateController(typeof(TController), parameters);
-        }
+        /// <summary>
+        /// Add a new screen to the application by pushing it
+        /// </summary>
+        Push,
+        /// <summary>
+        /// Add a new screen to the application by setting it (pop previous one, then push new one)
+        /// </summary>
+        Set
     }
 }

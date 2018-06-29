@@ -1,4 +1,4 @@
-﻿// This file is part of the Unity-MVC Project
+﻿// This file is part of the Unity-MVC project
 // https://github.com/RLefrancoise/Unity-MVC
 // 
 // BSD 3-Clause License
@@ -30,26 +30,15 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using System;
-using Mvc.Unity;
+using Mvc;
 
-namespace Mvc.Examples.Calculator
+namespace Mvc.Screens
 {
-    /// <inheritdoc cref="AbstractControllerFactory{TControllerFactoryParams}"/>
-    /// <inheritdoc cref="ICalculatorControllerFactory"/>
-    /// <summary>
-    /// Factory for calculator controllers
-    /// </summary>
-    public class CalculatorControllerFactory : AbstractControllerFactory<CalculatorControllerFactoryParams>, ICalculatorControllerFactory
+    public interface IMvcScreen<out TController> : IScreen
     {
-        protected override IController CreateController(Type controllerType, CalculatorControllerFactoryParams parameters)
-        {
-            return (IController) CreateItem(controllerType, new object[] {new CalculatorModel(), parameters.View});
-        }
-
-        protected override TController CreateController<TController>(CalculatorControllerFactoryParams parameters)
-        {
-            return (TController) CreateController(typeof(TController), parameters);
-        }
+        /// <summary>
+        /// The controller of the screen
+        /// </summary>
+        TController Controller { get; }
     }
 }
