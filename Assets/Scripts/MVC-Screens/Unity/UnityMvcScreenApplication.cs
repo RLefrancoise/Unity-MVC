@@ -79,7 +79,7 @@ namespace Mvc.Screens.Unity
         #region Properties        
         public static TApplication Instance => _instance ?? (_instance = FindObjectOfType<TApplication>());
 
-        public abstract Dictionary<IScreenType, ScreenData> Screens { get; }
+        public abstract Dictionary<IConvertible, ScreenData> Screens { get; }
         #endregion
         
         #region MonoBehaviour
@@ -100,7 +100,7 @@ namespace Mvc.Screens.Unity
         /// </summary>
         /// <param name="screenType">Screen type</param>
         /// <param name="mode">Create screen mode</param>
-        public void CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode) where TScreenType : struct, IScreenType
+        public void CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode) where TScreenType : struct, IConvertible
         {
             StartCoroutine(_CreateScreen(screenType, mode));
         }
@@ -131,7 +131,7 @@ namespace Mvc.Screens.Unity
         /// <param name="screenType">Screen type</param>
         /// <param name="mode">Create screen mode</param>
         /// <returns></returns>
-        private IEnumerator _CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode) where TScreenType : struct, IScreenType
+        private IEnumerator _CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode) where TScreenType : struct, IConvertible
         {
             string scenePath = $"_Scenes/Screens/{Screens[screenType].Scene}";
             AsyncOperation asyncOp = SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Additive);
