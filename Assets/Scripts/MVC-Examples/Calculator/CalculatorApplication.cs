@@ -39,7 +39,7 @@ namespace Mvc.Examples.Calculator
     /// <summary>
     /// The calculator application
     /// </summary>
-    public class CalculatorApplication : UnityMvcApplication, ICalculatorApplication
+    public class CalculatorApplication : UnityMvcApplication<CalculatorApplication>, ICalculatorApplication
     {
         /// <summary>
         /// The GameObject of the view
