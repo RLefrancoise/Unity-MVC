@@ -46,6 +46,11 @@ namespace Mvc.Screens.Unity
     /// <typeparam name="TApplication">Type of the application</typeparam>
     public abstract class UnityMvcScreenApplication<TApplication> : UnityMvcApplication<TApplication> where TApplication : UnityMvcApplication<TApplication>
     {
+        /// <summary>
+        /// Folder containing the screen of the application
+        /// </summary>
+        public string ScreensFolder;
+
         #region Intern Classes
 
         /// <summary>
@@ -53,12 +58,20 @@ namespace Mvc.Screens.Unity
         /// </summary>
         public class ScreenSceneLoadedEventArgs : EventArgs
         {
+            /// <summary>
+            /// Identifier of the screen to load
+            /// </summary>
             public IConvertible Screen { get; set; }
 
             /// <summary>
             /// Create screen mode
             /// </summary>
             public CreateScreenMode Mode { get; set; }
+
+            /// <summary>
+            /// Transition between loaded screen and current one
+            /// </summary>
+            public ScreenTransition Transition { get; set; }
         }
 
         #endregion
@@ -83,9 +96,10 @@ namespace Mvc.Screens.Unity
         /// </summary>
         /// <param name="screenType">Screen type</param>
         /// <param name="mode">Create screen mode</param>
-        public void CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode) where TScreenType : struct, IConvertible
+        /// <param name="transition">Transition between screens</param>
+        public void CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode, ScreenTransition transition = ScreenTransition.None) where TScreenType : struct, IConvertible
         {
-            StartCoroutine(_CreateScreen(screenType, mode));
+            StartCoroutine(_CreateScreen(screenType, mode, transition));
         }
         #endregion
 
@@ -120,13 +134,15 @@ namespace Mvc.Screens.Unity
         #endregion
 
         #region Coroutines
+
         /// <summary>
         /// Coroutine to load screen scene asynchronously
         /// </summary>
         /// <param name="screenType">Screen type</param>
         /// <param name="mode">Create screen mode</param>
+        /// <param name="transition">Transition between screens</param>
         /// <returns></returns>
-        private IEnumerator _CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode) where TScreenType : struct, IConvertible
+        private IEnumerator _CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode, ScreenTransition transition) where TScreenType : struct, IConvertible
         {
             //Check if type is an enum
             Type t = typeof(TScreenType);
@@ -143,7 +159,8 @@ namespace Mvc.Screens.Unity
             OnScreenSceneLoaded?.Invoke(this, new ScreenSceneLoadedEventArgs
             {
                 Mode = mode,
-                Screen = screenType
+                Screen = screenType,
+                Transition = transition
             });
         }
         #endregion
