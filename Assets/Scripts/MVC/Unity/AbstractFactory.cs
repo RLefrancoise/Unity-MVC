@@ -31,7 +31,6 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
-using System.Collections.Generic;
 
 namespace Mvc.Unity
 {
@@ -41,24 +40,15 @@ namespace Mvc.Unity
     /// </summary>
     public abstract class AbstractFactory : IFactory
     {
-        //public List<IController> Controllers { get; private set; }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Contruct a new factory
-        /// </summary>
-
         public IFactoryItem CreateItem(Type type, object[] parameters)
         {
             IFactoryItem item = (IFactoryItem) Activator.CreateInstance(type, parameters);
             return item;
-            //Controllers.Add(item);
         }
 
         public TFactoryItem CreateItem<TFactoryItem>(object[] parameters) where TFactoryItem : IFactoryItem
         {
             TFactoryItem item = (TFactoryItem) Activator.CreateInstance(typeof(TFactoryItem), parameters);
-            //Controllers.Add((IController) item);
             return item;
         }
     }

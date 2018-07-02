@@ -32,7 +32,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Globalization;
 using Mvc.Unity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -44,7 +44,7 @@ namespace Mvc.Screens.Unity
     /// Base class for any Unity MVC screen application
     /// </summary>
     /// <typeparam name="TApplication">Type of the application</typeparam>
-    public abstract class UnityMvcScreenApplication<TApplication> : UnityMvcApplication where TApplication : UnityMvcApplication
+    public abstract class UnityMvcScreenApplication<TApplication> : UnityMvcApplication<TApplication> where TApplication : UnityMvcApplication<TApplication>
     {
         #region Intern Classes
 
@@ -53,10 +53,8 @@ namespace Mvc.Screens.Unity
         /// </summary>
         public class ScreenSceneLoadedEventArgs : EventArgs
         {
-            /// <summary>
-            /// Screen data
-            /// </summary>
-            public ScreenData ScreenData { get; set; }
+            public IConvertible Screen { get; set; }
+
             /// <summary>
             /// Create screen mode
             /// </summary>
@@ -71,26 +69,11 @@ namespace Mvc.Screens.Unity
         /// </summary>
         private event EventHandler<ScreenSceneLoadedEventArgs> OnScreenSceneLoaded;
         #endregion
-
-        #region Fields
-        private static TApplication _instance;
-        #endregion
-
-        #region Properties        
-        public static TApplication Instance => _instance ?? (_instance = FindObjectOfType<TApplication>());
-
-        public abstract Dictionary<IConvertible, ScreenData> Screens { get; }
-        #endregion
         
         #region MonoBehaviour
-        protected void Awake()
+        protected virtual void Awake()
         {
             OnScreenSceneLoaded += WhenScreenLoaded;
-        }
-
-        protected virtual void OnDestroy()
-        {
-            if (_instance == this) _instance = null;
         }
         #endregion
 
@@ -115,12 +98,24 @@ namespace Mvc.Screens.Unity
         /// <param name="args"></param>
         private static void WhenScreenLoaded(object sender, ScreenSceneLoadedEventArgs args)
         {
-            IScreen screen = (IScreen)FindObjectOfType(args.ScreenData.Type);
+            Type screenType = Type.GetType($"Screens.{args.Screen.ToString(CultureInfo.InvariantCulture)}Screen");
+            IScreen screen = (IScreen)FindObjectOfType(screenType);
+
+            //Check if we need to destroy current scene (when we are in SET mode)
+            IScreen currentScreen = ScreenManager.Instance.CurrentScreen;
+            bool unloadScene = args.Mode == CreateScreenMode.Set && ScreenManager.Instance.NumberOfScreens != 0;
 
             if (args.Mode == CreateScreenMode.Push)
                 ScreenManager.Instance.PushScreen(screen);
             else
                 ScreenManager.Instance.SetScreen(screen);
+
+            //If we need to unload screen scene, unload it
+            if (unloadScene)
+            {
+                string currentScreenName = currentScreen.GetType().Name.Replace("Screen", "");
+                SceneManager.UnloadSceneAsync($"_Scenes/Screens/{currentScreenName}");
+            }
         }
         #endregion
 
@@ -133,7 +128,14 @@ namespace Mvc.Screens.Unity
         /// <returns></returns>
         private IEnumerator _CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode) where TScreenType : struct, IConvertible
         {
-            string scenePath = $"_Scenes/Screens/{Screens[screenType].Scene}";
+            //Check if type is an enum
+            Type t = typeof(TScreenType);
+            if(!t.IsEnum) throw new Exception("Screen type is not an enumeration");
+
+            //We can deduce the name of the scene from the screenType
+            string screenName = screenType.ToString(CultureInfo.InvariantCulture);
+
+            string scenePath = $"_Scenes/Screens/{screenName}";
             AsyncOperation asyncOp = SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Additive);
 
             while (!asyncOp.isDone) yield return new WaitForEndOfFrame();
@@ -141,7 +143,7 @@ namespace Mvc.Screens.Unity
             OnScreenSceneLoaded?.Invoke(this, new ScreenSceneLoadedEventArgs
             {
                 Mode = mode,
-                ScreenData = Screens[screenType] 
+                Screen = screenType
             });
         }
         #endregion

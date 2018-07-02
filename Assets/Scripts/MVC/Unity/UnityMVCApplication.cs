@@ -38,13 +38,42 @@ namespace Mvc.Unity
     /// <summary>
     /// Base class for any Unity Mvc application
     /// </summary>
-    public abstract class UnityMvcApplication : MonoBehaviour, IApplication
+    public abstract class UnityMvcApplication<TApplication> : MonoBehaviour, IApplication where TApplication : UnityMvcApplication<TApplication>
     {
+        #region Fields
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
+        private static TApplication _instance;
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Singleton instance accessor
+        /// </summary>
+        public static TApplication Instance => _instance ?? (_instance = FindObjectOfType<TApplication>());
+
         public abstract IControllerFactory ControllerFactory { get; }
+
+        #endregion
+
+        #region Public Methods
 
         public bool DestroyController(IController controller)
         {
-            return ControllerFactory.Controllers.Remove(controller);   
+            return ControllerFactory.Controllers.Remove(controller);
         }
+
+        #endregion
+
+        #region MonoBehaviour
+
+        protected virtual void OnDestroy()
+        {
+            if (_instance == this) _instance = null;
+        }
+
+        #endregion
     }
 }
