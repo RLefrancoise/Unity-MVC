@@ -38,6 +38,10 @@ namespace Mvc.Screens
         MoveDown,
         MoveLeft,
         MoveRight,
+        ExitUp,
+        ExitDown,
+        ExitLeft,
+        ExitRight,
         None
     }
 }

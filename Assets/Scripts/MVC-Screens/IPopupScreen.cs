@@ -30,51 +30,29 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+using System;
+using System.Collections.Generic;
 
-using System.Collections;
-using UnityEngine;
-
-namespace Other
+namespace Mvc.Screens
 {
-    public static class TransformExtensions
+    public delegate void PopupButtonClicked(string button);
+
+    /*public class PopupScreenButtonArgs : EventArgs
     {
-        public static void Move(this Transform transform, MonoBehaviour monoBehaviour, Vector3 source, Vector3 dest, float moveTime = 1f)
-        {
-            monoBehaviour.StartCoroutine(_MoveTransform(transform, source, dest, moveTime));
-        }
+        public string Button { get; set; }    
+    }*/
 
-        public static IEnumerator Move(this Transform transform, Vector3 start, Vector3 end, float animTime = 1f)
-        {
-            yield return _MoveTransform(transform, start, end, animTime);
-        }
+    public interface IPopupScreen
+    {
+        string Title { get; set; }
 
-        public static IEnumerator Scale(this Transform transform, Vector3 start, Vector3 end, float animTime = 1f)
-        {
-            yield return _ScaleTransform(transform, start, end, animTime);
-        }
+        string Message { get; set; }
 
-        private static IEnumerator _MoveTransform(Transform target, Vector3 start, Vector3 end, float animTime = 1f)
-        {
-            float t = 0f;
-            while (t <= 1f)
-            {
-                target.localPosition = Vector3.Lerp(start, end, t);
-                t += Time.deltaTime / animTime;
-                if (t > 1f && target.localPosition != end) t = 1f;
-                yield return null;
-            }
-        }
+        List<string> Buttons { get; set; }
 
-        private static IEnumerator _ScaleTransform(Transform target, Vector3 start, Vector3 end, float animTime = 1f)
-        {
-            float t = 0f;
-            while (t <= 1f)
-            {
-                target.localScale = Vector3.Lerp(start, end, t);
-                t += Time.deltaTime / animTime;
-                if (t > 1f && target.localScale != end) t = 1f;
-                yield return null;
-            }
-        }
+        void Show(PopupButtonClicked buttonClickedCallback = null);
+        void Hide();
+
+        //event EventHandler<PopupScreenButtonArgs> OnButtonClicked;
     }
 }

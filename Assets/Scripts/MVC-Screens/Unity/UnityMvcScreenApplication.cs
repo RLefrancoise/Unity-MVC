@@ -32,6 +32,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using Mvc.Unity;
 using Other;
@@ -47,8 +48,19 @@ namespace Mvc.Screens.Unity
     /// <typeparam name="TApplication">Type of the application</typeparam>
     public abstract class UnityMvcScreenApplication<TApplication> : UnityMvcApplication<TApplication> where TApplication : UnityMvcApplication<TApplication>
     {
+        #region Fields
+
+        private ScreenManager _screenManager;
+
+        private GameObject _scenesGroupGameObject;
+
+        private Dictionary<string, GameObject> _scenesRoots;
+
+        private Scene _mainScene;
+        private GameObject _popupGameObject;
+
         /// <summary>
-        /// Folder containing the screen of the application
+        /// Folder containing the screens of the application
         /// </summary>
         public string ScreensFolder;
 
@@ -56,6 +68,17 @@ namespace Mvc.Screens.Unity
         /// Time in seconds between two screens
         /// </summary>
         public float ScreenTransitionTime = 0.5f;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Get gameobject of current screen
+        /// </summary>
+        public GameObject CurrentScreenGameObject => (_screenManager.CurrentScreen as Component).gameObject;
+
+        #endregion
 
         #region Intern Classes
 
@@ -68,6 +91,12 @@ namespace Mvc.Screens.Unity
             /// Scene that has been loaded
             /// </summary>
             public Scene LoadedScene { get; set; }
+
+            /// <summary>
+            /// Gameobject that contains the screen
+            /// </summary>
+            public GameObject ScreenGameObject { get; set; }
+
             /// <summary>
             /// Identifier of the screen to load
             /// </summary>
@@ -91,13 +120,41 @@ namespace Mvc.Screens.Unity
         /// Called when a screen scene is loaded
         /// </summary>
         private event EventHandler<ScreenSceneLoadedEventArgs> OnScreenSceneLoaded;
+
         #endregion
         
         #region MonoBehaviour
-        protected virtual void Awake()
+        private void Awake()
         {
+            _screenManager = new ScreenManager();
+
+            _scenesRoots = new Dictionary<string, GameObject>();
+            _scenesGroupGameObject = new GameObject("Scenes");
+
+            _mainScene = SceneManager.GetActiveScene();
+
+            //Load popup scene
+            SceneManager.LoadScene($"{ScreensFolder}/Popup", LoadSceneMode.Additive);
+            
+            //Listen to screen loading
             OnScreenSceneLoaded += WhenScreenLoaded;
         }
+
+        protected virtual void Start()
+        {
+            Scene popupScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
+
+            //Move popup scene content to scene group
+            _popupGameObject = popupScene.GetRootGameObjects()[0];
+            _popupGameObject.name = "Popup";
+            _popupGameObject.transform.SetParent(_scenesGroupGameObject.transform);
+            
+            //Unload popup scene as it is not used anymore
+            SceneManager.UnloadSceneAsync($"{ScreensFolder}/Popup");
+
+            UnityPopupScreen.Instance.Hide();
+        }
+
         #endregion
 
         #region Public Methods
@@ -111,6 +168,48 @@ namespace Mvc.Screens.Unity
         {
             StartCoroutine(_CreateScreen(screenType, mode, transition));
         }
+
+        /// <summary>
+        /// Pop the current screen and go back to previous one
+        /// </summary>
+        /// <param name="transition"></param>
+        public void PopScreen(ScreenTransition transition = ScreenTransition.None)
+        {
+            StartCoroutine(_PopScreen(transition));
+        }
+
+        /// <summary>
+        /// Display a popup message
+        /// </summary>
+        /// <param name="title">Title of the popup</param>
+        /// <param name="message">Message of the popup</param>
+        /// <param name="buttons">Buttons of the popup</param>
+        /// <param name="buttonClickedCallback">Callback to call when a button has been clicked</param>
+        public void Popup(string title, string message, List<string> buttons, PopupButtonClicked buttonClickedCallback = null)
+        {
+            CurrentScreenGameObject.GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+            _popupGameObject.transform.SetAsLastSibling();
+
+            UnityPopupScreen.Instance.Title = title;
+            UnityPopupScreen.Instance.Message = message;
+            UnityPopupScreen.Instance.Buttons = buttons;
+            UnityPopupScreen.Instance.Show(button =>
+            {
+                CurrentScreenGameObject.GetComponent<CanvasGroup>().blocksRaycasts = true;
+                buttonClickedCallback?.Invoke(button);
+            });
+        }
+        #endregion
+
+        #region Private Methods
+
+        private void _DeleteScreen(GameObject screen)
+        {
+            Destroy(_scenesRoots[screen.name]);
+            _scenesRoots.Remove(screen.name);
+        }
+
         #endregion
 
         #region Callbacks
@@ -126,23 +225,24 @@ namespace Mvc.Screens.Unity
             SceneManager.SetActiveScene(args.LoadedScene);
 
             //Add screen to screen manager
-            Type screenType = Type.GetType($"Screens.{args.Screen.ToString(CultureInfo.InvariantCulture)}Screen");
-            IScreen screen = (IScreen)FindObjectOfType(screenType);
+            IScreen screen = args.ScreenGameObject.GetComponent<IScreen>();
 
             //Check if we need to destroy current scene (when we are in SET mode)
-            IScreen currentScreen = ScreenManager.Instance.CurrentScreen;
-            bool unloadScene = args.Mode == CreateScreenMode.Set && ScreenManager.Instance.NumberOfScreens != 0;
+            IScreen currentScreen = _screenManager.CurrentScreen;
+            bool unloadScene = args.Mode == CreateScreenMode.Set && _screenManager.NumberOfScreens != 0;
 
             if (args.Mode == CreateScreenMode.Push)
-                ScreenManager.Instance.PushScreen(screen);
+                _screenManager.PushScreen(screen);
             else
-                ScreenManager.Instance.SetScreen(screen);
+                _screenManager.SetScreen(screen);
 
             //If we need to unload screen scene, unload it
             if (unloadScene)
             {
                 string currentScreenName = currentScreen.GetType().Name.Replace("Screen", "");
                 SceneManager.UnloadSceneAsync($"{ScreensFolder}/{currentScreenName}");
+                //Destroy scene node in scene group
+                _DeleteScreen(_scenesRoots[currentScreenName]);
             }
         }
         #endregion
@@ -172,16 +272,54 @@ namespace Mvc.Screens.Unity
             Scene loadedScene = SceneManager.GetSceneByName(screenName);
             while(!loadedScene.isLoaded) yield return new WaitForEndOfFrame();
 
+            //Add scene to scene group
+            _scenesRoots.Add(screenName, loadedScene.GetRootGameObjects()[0]);
+            
+            loadedScene.GetRootGameObjects()[0].name = screenName;
+            loadedScene.GetRootGameObjects()[0].transform.SetParent(_scenesGroupGameObject.transform);
+
             //Play transition between screens
-            yield return _PlayScreenTransition(loadedScene.GetRootGameObjects()[0], transition);
+            yield return _PlayScreenTransition(_scenesRoots[screenName], transition);
 
             OnScreenSceneLoaded?.Invoke(this, new ScreenSceneLoadedEventArgs
             {
                 LoadedScene = loadedScene,
+                ScreenGameObject = _scenesRoots[screenName],
                 Mode = mode,
                 Screen = screenType,
                 Transition = transition
             });
+        }
+
+        private IEnumerator _PopScreen(ScreenTransition transition)
+        {
+            GameObject activeScreenGameObject = (_screenManager.CurrentScreen as Component).gameObject;
+            Scene activeScene = SceneManager.GetActiveScene();
+
+            //Play pop transition
+            yield return _PlayScreenTransition(activeScreenGameObject, transition);
+
+            //Pop the screen
+            _screenManager.PopScreen();
+
+            //Delete scene node in scene group
+            _DeleteScreen(activeScreenGameObject);
+
+            //unload active scene (which is current screen scene)
+            AsyncOperation asyncOp = SceneManager.UnloadSceneAsync(activeScene);
+            while(!asyncOp.isDone) yield return new WaitForEndOfFrame();
+
+            //If no more screens in the stack, make main scene active
+            if (_screenManager.NumberOfScreens == 0)
+            {
+                SceneManager.SetActiveScene(_mainScene);
+            }
+            //Else make current screen scene active
+            else
+            {
+                Component screenComponent = (Component) _screenManager.CurrentScreen;
+                SceneManager.SetActiveScene(screenComponent.gameObject.scene);
+            }
         }
 
         /// <summary>
@@ -205,6 +343,18 @@ namespace Mvc.Screens.Unity
                     break;
                 case ScreenTransition.MoveRight:
                     yield return screenGameObject.transform.GetChild(0).Move(new Vector3(screenGameObject.GetComponent<Canvas>().pixelRect.width, 0, 0), Vector3.zero, ScreenTransitionTime);
+                    break;
+                case ScreenTransition.ExitLeft:
+                    yield return screenGameObject.transform.GetChild(0).Move(Vector3.zero, new Vector3(-screenGameObject.GetComponent<Canvas>().pixelRect.width, 0, 0), ScreenTransitionTime);
+                    break;
+                case ScreenTransition.ExitUp:
+                    yield return screenGameObject.transform.GetChild(0).Move(Vector3.zero, new Vector3(-screenGameObject.GetComponent<Canvas>().pixelRect.height, 0, 0), ScreenTransitionTime);
+                    break;
+                case ScreenTransition.ExitDown:
+                    yield return screenGameObject.transform.GetChild(0).Move(Vector3.zero, new Vector3(screenGameObject.GetComponent<Canvas>().pixelRect.height, 0, 0), ScreenTransitionTime);
+                    break;
+                case ScreenTransition.ExitRight:
+                    yield return screenGameObject.transform.GetChild(0).Move(Vector3.zero, new Vector3(screenGameObject.GetComponent<Canvas>().pixelRect.width, 0, 0), ScreenTransitionTime);
                     break;
                 default:
                     yield break;

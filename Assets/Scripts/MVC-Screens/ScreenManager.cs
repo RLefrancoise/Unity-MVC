@@ -38,7 +38,7 @@ namespace Mvc.Screens
     /// <summary>
     /// The screen manager manages all the screens of the application. You can navigate between screens through it.
     /// </summary>
-    public sealed class ScreenManager : Singleton<ScreenManager>
+    public sealed class ScreenManager
     {
         /// <summary>
         /// Screen stack to handle the screens
