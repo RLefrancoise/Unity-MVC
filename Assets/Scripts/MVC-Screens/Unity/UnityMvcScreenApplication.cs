@@ -34,6 +34,7 @@ using System;
 using System.Collections;
 using System.Globalization;
 using Mvc.Unity;
+using Other;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -58,6 +59,10 @@ namespace Mvc.Screens.Unity
         /// </summary>
         public class ScreenSceneLoadedEventArgs : EventArgs
         {
+            /// <summary>
+            /// Scene that has been loaded
+            /// </summary>
+            public Scene LoadedScene { get; set; }
             /// <summary>
             /// Identifier of the screen to load
             /// </summary>
@@ -110,8 +115,12 @@ namespace Mvc.Screens.Unity
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private static void WhenScreenLoaded(object sender, ScreenSceneLoadedEventArgs args)
+        private void WhenScreenLoaded(object sender, ScreenSceneLoadedEventArgs args)
         {
+            //Active loaded scene
+            SceneManager.SetActiveScene(args.LoadedScene);
+
+            //Add screen to screen manager
             Type screenType = Type.GetType($"Screens.{args.Screen.ToString(CultureInfo.InvariantCulture)}Screen");
             IScreen screen = (IScreen)FindObjectOfType(screenType);
 
@@ -128,7 +137,7 @@ namespace Mvc.Screens.Unity
             if (unloadScene)
             {
                 string currentScreenName = currentScreen.GetType().Name.Replace("Screen", "");
-                SceneManager.UnloadSceneAsync($"_Scenes/Screens/{currentScreenName}");
+                SceneManager.UnloadSceneAsync($"{ScreensFolder}/{currentScreenName}");
             }
         }
         #endregion
@@ -150,18 +159,51 @@ namespace Mvc.Screens.Unity
 
             //We can deduce the name of the scene from the screenType
             string screenName = screenType.ToString(CultureInfo.InvariantCulture);
+            string scenePath = $"{ScreensFolder}/{screenName}";
 
-            string scenePath = $"_Scenes/Screens/{screenName}";
             AsyncOperation asyncOp = SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Additive);
-
             while (!asyncOp.isDone) yield return new WaitForEndOfFrame();
+
+            Scene loadedScene = SceneManager.GetSceneByName(screenName);
+            while(!loadedScene.isLoaded) yield return new WaitForEndOfFrame();
+
+            //Play transition between screens
+            yield return _PlayScreenTransition(loadedScene.GetRootGameObjects()[0], transition);
 
             OnScreenSceneLoaded?.Invoke(this, new ScreenSceneLoadedEventArgs
             {
+                LoadedScene = loadedScene,
                 Mode = mode,
                 Screen = screenType,
                 Transition = transition
             });
+        }
+
+        /// <summary>
+        /// Play transition between screens
+        /// </summary>
+        /// <param name="screenGameObject">GameObject of the screen to move</param>
+        /// <param name="screenTransition">Transition to play</param>
+        /// <returns></returns>
+        private IEnumerator _PlayScreenTransition(GameObject screenGameObject, ScreenTransition screenTransition)
+        {
+            switch (screenTransition)
+            {
+                case ScreenTransition.MoveLeft:
+                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(-screenGameObject.GetComponent<Canvas>().pixelRect.width, 0, 0), Vector3.zero);
+                    break;
+                case ScreenTransition.MoveUp:
+                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(0, -screenGameObject.GetComponent<Canvas>().pixelRect.height, 0), Vector3.zero);
+                    break;
+                case ScreenTransition.MoveDown:
+                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(0, screenGameObject.GetComponent<Canvas>().pixelRect.height, 0), Vector3.zero);
+                    break;
+                case ScreenTransition.MoveRight:
+                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(screenGameObject.GetComponent<Canvas>().pixelRect.width, 0, 0), Vector3.zero);
+                    break;
+                default:
+                    yield break;
+            }
         }
         #endregion
     }
