@@ -53,9 +53,9 @@ namespace Other
             float t = 0f;
             while (t <= 1f)
             {
-                target.GetComponent<RectTransform>().localPosition = Vector3.Lerp(start, end, t);
+                target.localPosition = Vector3.Lerp(start, end, t);
                 t += Time.deltaTime / animTime;
-                if (t > 1f && target.GetComponent<RectTransform>().localPosition != end) t = 1f;
+                if (t > 1f && target.localPosition != end) t = 1f;
                 yield return null;
             }
         }

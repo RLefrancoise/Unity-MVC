@@ -52,6 +52,11 @@ namespace Mvc.Screens.Unity
         /// </summary>
         public string ScreensFolder;
 
+        /// <summary>
+        /// Time in seconds between two screens
+        /// </summary>
+        public float ScreenTransitionTime = 0.5f;
+
         #region Intern Classes
 
         /// <summary>
@@ -190,16 +195,16 @@ namespace Mvc.Screens.Unity
             switch (screenTransition)
             {
                 case ScreenTransition.MoveLeft:
-                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(-screenGameObject.GetComponent<Canvas>().pixelRect.width, 0, 0), Vector3.zero);
+                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(-screenGameObject.GetComponent<Canvas>().pixelRect.width, 0, 0), Vector3.zero, ScreenTransitionTime);
                     break;
                 case ScreenTransition.MoveUp:
-                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(0, -screenGameObject.GetComponent<Canvas>().pixelRect.height, 0), Vector3.zero);
+                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(0, -screenGameObject.GetComponent<Canvas>().pixelRect.height, 0), Vector3.zero, ScreenTransitionTime);
                     break;
                 case ScreenTransition.MoveDown:
-                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(0, screenGameObject.GetComponent<Canvas>().pixelRect.height, 0), Vector3.zero);
+                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(0, screenGameObject.GetComponent<Canvas>().pixelRect.height, 0), Vector3.zero, ScreenTransitionTime);
                     break;
                 case ScreenTransition.MoveRight:
-                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(screenGameObject.GetComponent<Canvas>().pixelRect.width, 0, 0), Vector3.zero);
+                    yield return screenGameObject.transform.GetChild(0).Move(new Vector3(screenGameObject.GetComponent<Canvas>().pixelRect.width, 0, 0), Vector3.zero, ScreenTransitionTime);
                     break;
                 default:
                     yield break;
