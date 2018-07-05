@@ -31,14 +31,13 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.Collections.Generic;
-using Other;
 
 namespace Mvc.Screens
 {
     /// <summary>
     /// The screen manager manages all the screens of the application. You can navigate between screens through it.
     /// </summary>
-    public sealed class ScreenManager : Singleton<ScreenManager>
+    public sealed class ScreenManager
     {
         /// <summary>
         /// Screen stack to handle the screens
@@ -66,9 +65,10 @@ namespace Mvc.Screens
         /// <summary>
         /// Push a screen to be displayed
         /// </summary>
-        /// <param name="screen"></param>
+        /// <param name="screen">The screen to push</param>
+        /// <param name="data">data to send to the screen</param>
         /// <returns>The pushed screen</returns>
-        public IScreen PushScreen(IScreen screen)
+        public IScreen PushScreen(IScreen screen, object data = null)
         {
             //If there is already a screen displayed, hide it
             if (Screens.Count > 0)
@@ -77,7 +77,7 @@ namespace Mvc.Screens
             }
 
             Screens.Push(screen);
-            screen.OnCreate();
+            screen.OnCreate(data);
             screen.OnShow();
 
             return screen;
@@ -104,15 +104,16 @@ namespace Mvc.Screens
 
             return screen;
         }
-        
+
         /// <summary>
         /// Set the current screen
         /// </summary>
         /// <param name="screen">The screen to set</param>
-        public void SetScreen(IScreen screen)
+        /// <param name="data"></param>
+        public void SetScreen(IScreen screen, object data = null)
         {
             PopScreen();
-            PushScreen(screen);
+            PushScreen(screen, data);
         }
 
         /// <summary>

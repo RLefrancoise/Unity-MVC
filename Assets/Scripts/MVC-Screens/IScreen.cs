@@ -42,7 +42,8 @@ namespace Mvc.Screens
         /// <summary>
         /// Called when screen is created
         /// </summary>
-        void OnCreate();
+        /// <param name="data">Data to send to the screen</param>
+        void OnCreate(object data = null);
 
         /// <summary>
         /// Called when screen is destroyed

@@ -30,43 +30,40 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using UnityEngine;
-
-namespace Mvc.Screens.Unity
+namespace Mvc.Screens
 {
-    /// <inheritdoc cref="IMvcScreen{TView}" />
+    public delegate void PopupButtonClicked(string button);
+
     /// <summary>
+    /// Base interface for any popup screen
     /// </summary>
-    /// <typeparam name="TController"></typeparam>
-    public abstract class UnityMvcScreen<TController> : MonoBehaviour, IMvcScreen<TController> where TController : IController
+    public interface IPopupScreen
     {
-        #region Properties
         /// <summary>
-        /// Data sent to the screen
+        /// Title of the popup
         /// </summary>
-        protected object Data { get; set; }
+        string Title { get; set; }
 
-        public virtual TController Controller { get; private set; }
-        #endregion
+        /// <summary>
+        /// Message of the popup
+        /// </summary>
+        string Message { get; set; }
 
-        public virtual void OnCreate(object data = null)
-        {
-            Data = data;
-            Controller = CreateController();
-        }
+        /// <summary>
+        /// Buttons of the popup
+        /// </summary>
+        string[] Buttons { get; set; }
 
-        public virtual void OnDestroyed() { }
+        /// <summary>
+        /// Show the popup
+        /// </summary>
+        /// <param name="buttonClickedCallback">Callback to be called when a button has been clicked</param>
+        /// <param name="data">Data to send to the popup</param>
+        void Show(PopupButtonClicked buttonClickedCallback = null, object data = null);
 
-        public virtual void OnShow()
-        {
-            gameObject.SetActive(true);
-        }
-
-        public virtual void OnHide()
-        {
-            gameObject.SetActive(false);
-        }
-
-        protected abstract TController CreateController();
+        /// <summary>
+        /// Hide the popup
+        /// </summary>
+        void Hide();
     }
 }

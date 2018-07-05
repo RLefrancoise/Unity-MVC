@@ -21,7 +21,7 @@
         /// </summary>
         public bool IsVisible { get; private set; }
 
-        public void OnCreate()
+        public void OnCreate(object data = null)
         {
             Created = true;
             Destroyed = false;

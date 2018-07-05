@@ -30,43 +30,11 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using UnityEngine;
+using Other;
 
 namespace Mvc.Screens.Unity
 {
-    /// <inheritdoc cref="IMvcScreen{TView}" />
-    /// <summary>
-    /// </summary>
-    /// <typeparam name="TController"></typeparam>
-    public abstract class UnityMvcScreen<TController> : MonoBehaviour, IMvcScreen<TController> where TController : IController
+    public class UnityLoadingScreen : UnitySingleton<UnityLoadingScreen>, ILoadingScreen
     {
-        #region Properties
-        /// <summary>
-        /// Data sent to the screen
-        /// </summary>
-        protected object Data { get; set; }
-
-        public virtual TController Controller { get; private set; }
-        #endregion
-
-        public virtual void OnCreate(object data = null)
-        {
-            Data = data;
-            Controller = CreateController();
-        }
-
-        public virtual void OnDestroyed() { }
-
-        public virtual void OnShow()
-        {
-            gameObject.SetActive(true);
-        }
-
-        public virtual void OnHide()
-        {
-            gameObject.SetActive(false);
-        }
-
-        protected abstract TController CreateController();
     }
 }

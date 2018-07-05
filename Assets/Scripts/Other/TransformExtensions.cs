@@ -30,43 +30,51 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+using System.Collections;
 using UnityEngine;
 
-namespace Mvc.Screens.Unity
+namespace Other
 {
-    /// <inheritdoc cref="IMvcScreen{TView}" />
-    /// <summary>
-    /// </summary>
-    /// <typeparam name="TController"></typeparam>
-    public abstract class UnityMvcScreen<TController> : MonoBehaviour, IMvcScreen<TController> where TController : IController
+    public static class TransformExtensions
     {
-        #region Properties
-        /// <summary>
-        /// Data sent to the screen
-        /// </summary>
-        protected object Data { get; set; }
-
-        public virtual TController Controller { get; private set; }
-        #endregion
-
-        public virtual void OnCreate(object data = null)
+        public static void Move(this Transform transform, MonoBehaviour monoBehaviour, Vector3 source, Vector3 dest, float moveTime = 1f)
         {
-            Data = data;
-            Controller = CreateController();
+            monoBehaviour.StartCoroutine(_MoveTransform(transform, source, dest, moveTime));
         }
 
-        public virtual void OnDestroyed() { }
-
-        public virtual void OnShow()
+        public static IEnumerator Move(this Transform transform, Vector3 start, Vector3 end, float animTime = 1f)
         {
-            gameObject.SetActive(true);
+            yield return _MoveTransform(transform, start, end, animTime);
         }
 
-        public virtual void OnHide()
+        public static IEnumerator Scale(this Transform transform, Vector3 start, Vector3 end, float animTime = 1f)
         {
-            gameObject.SetActive(false);
+            yield return _ScaleTransform(transform, start, end, animTime);
         }
 
-        protected abstract TController CreateController();
+        private static IEnumerator _MoveTransform(Transform target, Vector3 start, Vector3 end, float animTime = 1f)
+        {
+            float t = 0f;
+            while (t <= 1f)
+            {
+                target.localPosition = Vector3.Lerp(start, end, t);
+                t += Time.deltaTime / animTime;
+                if (t > 1f && target.localPosition != end) t = 1f;
+                yield return null;
+            }
+        }
+
+        private static IEnumerator _ScaleTransform(Transform target, Vector3 start, Vector3 end, float animTime = 1f)
+        {
+            float t = 0f;
+            while (t <= 1f)
+            {
+                target.localScale = Vector3.Lerp(start, end, t);
+                t += Time.deltaTime / animTime;
+                if (t > 1f && target.localScale != end) t = 1f;
+                yield return null;
+            }
+        }
     }
 }
