@@ -50,19 +50,45 @@ namespace Mvc.Screens.Unity
     {
         #region Fields
 
+        /// <summary>
+        /// Screen Manager
+        /// </summary>
         private ScreenManager _screenManager;
 
+        /// <summary>
+        /// Gameobject containing all the scenes
+        /// </summary>
         private GameObject _scenesGroupGameObject;
 
+        /// <summary>
+        /// Each root of each scene identified by the screen name
+        /// </summary>
         private Dictionary<string, GameObject> _scenesRoots;
 
+        /// <summary>
+        /// Reference to the main scene
+        /// </summary>
         private Scene _mainScene;
+
+        /// <summary>
+        /// Popup gameobject
+        /// </summary>
         private GameObject _popupGameObject;
+
+        /// <summary>
+        /// Loading screen gameobject
+        /// </summary>
+        private GameObject _loadingGameObject;
 
         /// <summary>
         /// Folder containing the screens of the application
         /// </summary>
         public string ScreensFolder;
+
+        /// <summary>
+        /// Folder of the theme containing the scenes to use
+        /// </summary>
+        public string ThemeFolder;
 
         /// <summary>
         /// Time in seconds between two screens
@@ -77,6 +103,11 @@ namespace Mvc.Screens.Unity
         /// Get gameobject of current screen
         /// </summary>
         public GameObject CurrentScreenGameObject => (_screenManager.CurrentScreen as Component).gameObject;
+
+        /// <summary>
+        /// Get current theme path 
+        /// </summary>
+        public string CurrentThemePath => string.IsNullOrEmpty(ThemeFolder) ? $"{ScreensFolder}" : $"{ScreensFolder}/{ThemeFolder}";
 
         #endregion
 
@@ -111,6 +142,11 @@ namespace Mvc.Screens.Unity
             /// Transition between loaded screen and current one
             /// </summary>
             public ScreenTransition Transition { get; set; }
+
+            /// <summary>
+            /// Data to send to the screen
+            /// </summary>
+            public object Data { get; set; }
         }
 
         #endregion
@@ -134,15 +170,18 @@ namespace Mvc.Screens.Unity
             _mainScene = SceneManager.GetActiveScene();
 
             //Load popup scene
-            SceneManager.LoadScene($"{ScreensFolder}/Popup", LoadSceneMode.Additive);
+            SceneManager.LoadScene($"{CurrentThemePath}/Popup", LoadSceneMode.Additive);
             
+            //Load loading scene
+            SceneManager.LoadScene($"{CurrentThemePath}/Loading", LoadSceneMode.Additive);
+
             //Listen to screen loading
             OnScreenSceneLoaded += WhenScreenLoaded;
         }
 
         protected virtual void Start()
         {
-            Scene popupScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
+            Scene popupScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 2);
 
             //Move popup scene content to scene group
             _popupGameObject = popupScene.GetRootGameObjects()[0];
@@ -150,23 +189,35 @@ namespace Mvc.Screens.Unity
             _popupGameObject.transform.SetParent(_scenesGroupGameObject.transform);
             
             //Unload popup scene as it is not used anymore
-            SceneManager.UnloadSceneAsync($"{ScreensFolder}/Popup");
+            SceneManager.UnloadSceneAsync(popupScene);
 
             UnityPopupScreen.Instance.Hide();
+
+            //Loading scene
+            Scene loadingScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
+
+            _loadingGameObject = loadingScene.GetRootGameObjects()[0];
+            _loadingGameObject.name = "Loading";
+            _loadingGameObject.transform.SetParent(_scenesGroupGameObject.transform);
+            _loadingGameObject.SetActive(false);
+
+            SceneManager.UnloadSceneAsync(loadingScene);
         }
 
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Create a new screen for the application
         /// </summary>
         /// <param name="screenType">Screen type</param>
         /// <param name="mode">Create screen mode</param>
         /// <param name="transition">Transition between screens</param>
-        public void CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode, ScreenTransition transition = ScreenTransition.None) where TScreenType : struct, IConvertible
+        /// <param name="data">Data to send to the screen</param>
+        public void CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode, ScreenTransition transition = ScreenTransition.None, object data = null) where TScreenType : struct, IConvertible
         {
-            StartCoroutine(_CreateScreen(screenType, mode, transition));
+            StartCoroutine(_CreateScreen(screenType, mode, transition, data));
         }
 
         /// <summary>
@@ -179,13 +230,51 @@ namespace Mvc.Screens.Unity
         }
 
         /// <summary>
+        /// Display a popup message with OK button
+        /// </summary>
+        /// <param name="title">Title of the popup</param>
+        /// <param name="message">Message of the popup</param>
+        /// <param name="buttonClickedCallback">Callbakc to call when a button has been clicked</param>
+        /// <param name="data">Data to send to the popup</param>
+        public void PopupOk(string title, string message, PopupButtonClicked buttonClickedCallback = null, object data = null)
+        {
+            Popup(title, message, new []{"Ok"}, buttonClickedCallback);
+        }
+
+        /// <summary>
+        /// Display a popup message with OK and Cancel buttons
+        /// </summary>
+        /// <param name="title">Title of the popup</param>
+        /// <param name="message">Message of the popup</param>
+        /// <param name="buttonClickedCallback">Callbakc to call when a button has been clicked</param>
+        /// <param name="data">Data to send to the popup</param>
+        public void PopupOkCancel(string title, string message, PopupButtonClicked buttonClickedCallback = null, object data = null)
+        {
+            Popup(title, message, new[] { "Ok", "Cancel" }, buttonClickedCallback);
+        }
+
+        /// <summary>
+        /// Display a popup message
+        /// </summary>
+        /// <param name="title">Title of the popup</param>
+        /// <param name="message">Message of the popup</param>
+        /// <param name="button">Button of the popup</param>
+        /// <param name="buttonClickedCallback">Callback to call when a button has been clicked</param>
+        /// <param name="data">Data to send to the popup</param>
+        public void Popup(string title, string message, string button, PopupButtonClicked buttonClickedCallback = null, object data = null)
+        {
+            Popup(title, message, new [] {button}, buttonClickedCallback, data);
+        }
+
+        /// <summary>
         /// Display a popup message
         /// </summary>
         /// <param name="title">Title of the popup</param>
         /// <param name="message">Message of the popup</param>
         /// <param name="buttons">Buttons of the popup</param>
         /// <param name="buttonClickedCallback">Callback to call when a button has been clicked</param>
-        public void Popup(string title, string message, List<string> buttons, PopupButtonClicked buttonClickedCallback = null)
+        /// <param name="data">Data to send to the popup</param>
+        public void Popup(string title, string message, string[] buttons, PopupButtonClicked buttonClickedCallback = null, object data = null)
         {
             CurrentScreenGameObject.GetComponent<CanvasGroup>().blocksRaycasts = false;
 
@@ -204,10 +293,25 @@ namespace Mvc.Screens.Unity
 
         #region Private Methods
 
+        /// <summary>
+        /// Destroy a screen (scene + remove from dictionary)
+        /// </summary>
+        /// <param name="screen"></param>
         private void _DeleteScreen(GameObject screen)
         {
             Destroy(_scenesRoots[screen.name]);
             _scenesRoots.Remove(screen.name);
+        }
+
+        /// <summary>
+        /// Display / Hide loading screen
+        /// </summary>
+        /// <param name="show">show or hide</param>
+        private void _ShowLoadingScreen(bool show)
+        {
+            //Show loading screen
+            if(show) _loadingGameObject.transform.SetAsLastSibling();
+            _loadingGameObject.SetActive(show);
         }
 
         #endregion
@@ -232,15 +336,15 @@ namespace Mvc.Screens.Unity
             bool unloadScene = args.Mode == CreateScreenMode.Set && _screenManager.NumberOfScreens != 0;
 
             if (args.Mode == CreateScreenMode.Push)
-                _screenManager.PushScreen(screen);
+                _screenManager.PushScreen(screen, args.Data);
             else
-                _screenManager.SetScreen(screen);
+                _screenManager.SetScreen(screen, args.Data);
 
             //If we need to unload screen scene, unload it
             if (unloadScene)
             {
                 string currentScreenName = currentScreen.GetType().Name.Replace("Screen", "");
-                SceneManager.UnloadSceneAsync($"{ScreensFolder}/{currentScreenName}");
+                SceneManager.UnloadSceneAsync($"{CurrentThemePath}/{currentScreenName}");
                 //Destroy scene node in scene group
                 _DeleteScreen(_scenesRoots[currentScreenName]);
             }
@@ -255,8 +359,9 @@ namespace Mvc.Screens.Unity
         /// <param name="screenType">Screen type</param>
         /// <param name="mode">Create screen mode</param>
         /// <param name="transition">Transition between screens</param>
+        /// <param name="data">Data to send to the screen</param>
         /// <returns></returns>
-        private IEnumerator _CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode, ScreenTransition transition) where TScreenType : struct, IConvertible
+        private IEnumerator _CreateScreen<TScreenType>(TScreenType screenType, CreateScreenMode mode, ScreenTransition transition, object data) where TScreenType : struct, IConvertible
         {
             //Check if type is an enum
             Type t = typeof(TScreenType);
@@ -264,13 +369,22 @@ namespace Mvc.Screens.Unity
 
             //We can deduce the name of the scene from the screenType
             string screenName = screenType.ToString(CultureInfo.InvariantCulture);
-            string scenePath = $"{ScreensFolder}/{screenName}";
+            string scenePath = $"{CurrentThemePath}/{screenName}";
+
+            //Blocks interactions while loading
+            if(_screenManager.NumberOfScreens != 0) CurrentScreenGameObject.GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+            //Show loading screen
+            _ShowLoadingScreen(true);
 
             AsyncOperation asyncOp = SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Additive);
             while (!asyncOp.isDone) yield return new WaitForEndOfFrame();
 
             Scene loadedScene = SceneManager.GetSceneByName(screenName);
             while(!loadedScene.isLoaded) yield return new WaitForEndOfFrame();
+
+            //Hide loading screen
+            _ShowLoadingScreen(false);
 
             //Add scene to scene group
             _scenesRoots.Add(screenName, loadedScene.GetRootGameObjects()[0]);
@@ -287,23 +401,29 @@ namespace Mvc.Screens.Unity
                 ScreenGameObject = _scenesRoots[screenName],
                 Mode = mode,
                 Screen = screenType,
-                Transition = transition
+                Transition = transition,
+                Data = data
             });
         }
 
+        /// <summary>
+        /// Coroutine to pop a screen
+        /// </summary>
+        /// <param name="transition">Transition to use when poping the screen</param>
+        /// <returns></returns>
         private IEnumerator _PopScreen(ScreenTransition transition)
         {
-            GameObject activeScreenGameObject = (_screenManager.CurrentScreen as Component).gameObject;
             Scene activeScene = SceneManager.GetActiveScene();
 
             //Play pop transition
-            yield return _PlayScreenTransition(activeScreenGameObject, transition);
+            yield return _PlayScreenTransition(CurrentScreenGameObject, transition);
 
             //Pop the screen
-            _screenManager.PopScreen();
+            IScreen screen = _screenManager.PopScreen();
 
             //Delete scene node in scene group
-            _DeleteScreen(activeScreenGameObject);
+            //_DeleteScreen(CurrentScreenGameObject);
+            _DeleteScreen((screen as Component).gameObject);
 
             //unload active scene (which is current screen scene)
             AsyncOperation asyncOp = SceneManager.UnloadSceneAsync(activeScene);
@@ -317,8 +437,9 @@ namespace Mvc.Screens.Unity
             //Else make current screen scene active
             else
             {
-                Component screenComponent = (Component) _screenManager.CurrentScreen;
-                SceneManager.SetActiveScene(screenComponent.gameObject.scene);
+                SceneManager.SetActiveScene(CurrentScreenGameObject.scene);
+                //Reenable interactions
+                CurrentScreenGameObject.GetComponent<CanvasGroup>().blocksRaycasts = true;
             }
         }
 

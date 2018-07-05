@@ -30,29 +30,40 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-using System;
-using System.Collections.Generic;
-
 namespace Mvc.Screens
 {
     public delegate void PopupButtonClicked(string button);
 
-    /*public class PopupScreenButtonArgs : EventArgs
-    {
-        public string Button { get; set; }    
-    }*/
-
+    /// <summary>
+    /// Base interface for any popup screen
+    /// </summary>
     public interface IPopupScreen
     {
+        /// <summary>
+        /// Title of the popup
+        /// </summary>
         string Title { get; set; }
 
+        /// <summary>
+        /// Message of the popup
+        /// </summary>
         string Message { get; set; }
 
-        List<string> Buttons { get; set; }
+        /// <summary>
+        /// Buttons of the popup
+        /// </summary>
+        string[] Buttons { get; set; }
 
-        void Show(PopupButtonClicked buttonClickedCallback = null);
+        /// <summary>
+        /// Show the popup
+        /// </summary>
+        /// <param name="buttonClickedCallback">Callback to be called when a button has been clicked</param>
+        /// <param name="data">Data to send to the popup</param>
+        void Show(PopupButtonClicked buttonClickedCallback = null, object data = null);
+
+        /// <summary>
+        /// Hide the popup
+        /// </summary>
         void Hide();
-
-        //event EventHandler<PopupScreenButtonArgs> OnButtonClicked;
     }
 }
